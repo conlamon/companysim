@@ -19,7 +19,7 @@ here = path.abspath(path.dirname(__file__))
 setup(
     name='companysim',
 
-    version='0.6',
+    version='0.7',
 
     description='Package to find similarity between pairs of companies based\
                  on textual information',
