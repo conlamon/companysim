@@ -1,48 +1,13 @@
 Metadata-Version: 1.1
 Name: companysim
-Version: 0.1
+Version: 0.6
 Summary: Package to find similarity between pairs of companies based                 on textual information
 Home-page: https://github.com/conlamon/companysim
 Author: Connor Lamon
 Author-email: connor.lamon@gmail.com
 License: MIT
-Description: ## Synopsis
-        
-        Library to determine if a pair of companies are similar based on textual description information.
-        
-        ## Code Example
-        
-        ```python
-        cc = CompanyCorpus(company_list)
-        cg = CompanyGraph(cc)
-        ```
-        
-        ## Installation
-        
-        ```
-        pip install companysim
-        ```
-        
-        ## Tests
-        
-        Tests can be run in the following way from the console:
-        ```
-        python3 test_companysim.py
-        ```
-        
-        ## Contributors
-        
-        Connor Lamon
-        
-        Meeran Ismail
-        
-        Ke Xu
-        
-        ## License
-        
-        MIT License
-        
-Keywords: Textual similarity / NLP / Company Similarity
+Description: UNKNOWN
+Keywords: textualsimilarity NLP
 Platform: UNKNOWN
 Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: Developers

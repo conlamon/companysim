@@ -1,7 +1,7 @@
 import math
 import re
 import string
-import nltk
+#import nltk
 
 
 class TfIdf:

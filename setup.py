@@ -13,17 +13,17 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+#with open(path.join(here, 'README.md')) as f:
+#    long_description = f.read()
 
 setup(
     name='companysim',
 
-    version='0.1',
+    version='0.6',
 
     description='Package to find similarity between pairs of companies based\
                  on textual information',
-    long_description=long_description,
+   # long_description=long_description,
 
     # The project's main homepage.
     url='https://github.com/conlamon/companysim',
@@ -54,7 +54,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='Textual similarity / NLP / Company Similarity',
+    keywords='textualsimilarity NLP',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
@@ -64,12 +64,14 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=[
-                     'datasketch>=1.2.1',
-                     'decorator>=4.0.11',
-                     'numpy>=1.12.1',
-                     'pandas>=0.20.1',
-                     'scipy>=0.19.0'
+    install_requires=['numpy>=1.12.1',
+                      'datasketch>=1.2.1',
+                      'decorator>=4.0.11',
+                      'pandas>=0.20.1',
+                      'scipy>=0.19.0',
+                      'python-dateutil>=2.6.0',
+                      'pytz>=2017.2',
+                      'setuptools>=18.1',
                      ],
 
     # To provide executable scripts, use entry points in preference to the
