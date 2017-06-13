@@ -1,7 +1,7 @@
 from datasketch import MinHashLSHForest, MinHash
 from scipy.sparse import lil_matrix
 import pandas as pd
-import companysim.tfidf as tfidf
+import companysim.tfidf
 import re
 import string
 import pickle
