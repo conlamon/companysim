@@ -1,0 +1,11 @@
+setup.cfg
+setup.py
+companysim/__init__.py
+companysim/companysim.py
+companysim/test_companysim.py
+companysim/tfidf.py
+companysim.egg-info/PKG-INFO
+companysim.egg-info/SOURCES.txt
+companysim.egg-info/dependency_links.txt
+companysim.egg-info/requires.txt
+companysim.egg-info/top_level.txt
