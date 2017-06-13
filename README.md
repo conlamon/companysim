@@ -9,27 +9,18 @@ cc = CompanyCorpus(company_list)
 cg = CompanyGraph(cc)
 ```
 
-
-## Motivation
-
-
-
 ## Installation
 
 ```
-pip install -U companysim
-```
-
-## Tests
-
-Tests can be run in the following way from the console:
-```
-python3 test_companysim.py
+pip install companysim
 ```
 
 ## Contributors
+
 Connor Lamon
+
 Meeran Ismail
+
 Ke Xu
 
 ## License
