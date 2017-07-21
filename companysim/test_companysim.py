@@ -4,7 +4,7 @@ import pandas as pd
 from companysim import CompanyCorpus, CompanyGraph, save_graph, load_graph
 
 
-class TestCompanyCorpus(unittest.TestCase):
+class TestCompanySim(unittest.TestCase):
 
     # ======== Start of tests for CompanyCorpus class
 
@@ -48,6 +48,7 @@ class TestCompanyCorpus(unittest.TestCase):
         print(cc.idf_vector)
         self.assertTrue(all(val in idf_vec for val in desired_output))
 
+    # Test that the company descriptions are correctly filtered by the top 'number_to_remove' words
     def test_filter_description_by_idf(self):
         test_corpus = [['company_1', 'Provider of software'], ['company_2', 'Provider of hardware']]
         test_input = pd.DataFrame(test_corpus, columns=['domain', 'description'])
@@ -64,6 +65,7 @@ class TestCompanyCorpus(unittest.TestCase):
 
     # ======== Start of tests for CompanyGraph class
 
+    # Test that the lsh forest is built correctly
     def test_build_lsh_forest(self):
         # Create a CompanyCorpus instance, and initialize it with some data
         test_corpus = [['company_1', 'Provider of software'], ['company_2', 'Provider of hardware']]
@@ -82,6 +84,7 @@ class TestCompanyCorpus(unittest.TestCase):
         cg.build_lsh_forest(company_name_column_name='domain')
         self.assertTrue(cg.lsh_forest)
 
+    # Test that the company graph is built correctly
     def test_build_graph(self):
         # Create a CompanyCorpus instance, and initialize it with some data
         test_corpus = [['company_1', 'Provider of software'], ['company_2', 'Provider of hardware'],
@@ -104,6 +107,7 @@ class TestCompanyCorpus(unittest.TestCase):
 
         self.assertIsNotNone(cg.graph)
 
+    # Test that the dot product score is correctly calculated
     def test_get_dot_product_score(self):
         # Create a CompanyCorpus instance, and initialize it with some data
         test_corpus = [['company_1', 'business software application'], ['company_2', 'hardware technology'],
@@ -120,11 +124,12 @@ class TestCompanyCorpus(unittest.TestCase):
         cg.build_graph(sensitivity=3)
 
         # Run test of function
-        #print(cg.graph.todense())
+
         dot_product_score = cg.get_dot_product_score('company_1', 'company_3')
-        #print(dot_product_score)
+
         self.assertNotEqual(0., dot_product_score)
 
+    # Test that the jaccard similarity is correctly calculated
     def test_get_jaccard_similarity(self):
         # Create a CompanyCorpus instance, and initialize it with some data
         test_corpus = [['company_1', 'Provider of software'], ['company_2', 'Provider of hardware technology'],
@@ -145,7 +150,7 @@ class TestCompanyCorpus(unittest.TestCase):
         jaccard_similarity = cg.get_jaccard_similarity('company_1', 'company_3')
         self.assertNotEqual(0., jaccard_similarity)
 
-
+    # Test that the company graph can be correctly picked to a file
     def test_save_graph(self):
         # Create a CompanyCorpus instance, and initialize it with some data
         test_corpus = [['company_1', 'Provider of software'], ['company_2', 'Provider of hardware technology'],
@@ -160,9 +165,9 @@ class TestCompanyCorpus(unittest.TestCase):
         cg = CompanyGraph(cc)
         cg.build_lsh_forest(company_name_column_name='domain')
         cg.build_graph(sensitivity=3)
-        save_graph(cg,
-                   filename='graph.pickle')
+        save_graph(cg, filename='graph.pickle')
 
+    # Test that the saved company graph can be correctly loaded
     def test_load_graph(self):
         # Create a CompanyCorpus instance, and initialize it with some data
         test_corpus = [['company_1', 'Provider of software'], ['company_2', 'Provider of hardware technology'],
@@ -177,7 +182,9 @@ class TestCompanyCorpus(unittest.TestCase):
         cg = CompanyGraph(cc)
         cg.build_lsh_forest(company_name_column_name='domain')
         cg.build_graph(sensitivity=3)
+        save_graph(cg, filename='graph.pickle')
 
+        # Load the graph
         cg_load = load_graph(filename='graph.pickle')
 
         self.assertTrue(np.array_equal(cg.graph.toarray(), cg_load.graph.toarray()))

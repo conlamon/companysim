@@ -2,6 +2,7 @@ from datasketch import MinHashLSHForest, MinHash
 from scipy.sparse import lil_matrix
 import pandas as pd
 import companysim.tfidf as tfidf
+#import tfidf as tfidf
 import re
 import string
 import pickle
@@ -10,7 +11,15 @@ import sys
 
 class CompanyCorpus(object):
 
-    # This class implements functions to handle a company corpus of text descriptions of companies to compare
+    """
+    Class representing a company corpus of text descriptions
+
+    Parameters:
+
+        corpus - pandas dataframe; company descriptions
+
+        idf (optional) - pandas series; series containing the idf words
+    """
 
     def __init__(self, corpus, idf=None):
 
@@ -32,12 +41,17 @@ class CompanyCorpus(object):
     def _build_corpus(corpus):
 
         """
+        Drop duplicate companies and set internal variable
 
-        :param corpus:
-        :return:
+        Parameters:
+
+            corpus - pandas dataframe; company descriptions
+
         """
+
         if not isinstance(corpus, pd.DataFrame):
             raise TypeError("Corpus must be a pandas DataFrame")
+
         # Clean up corpus by dropping duplicate companies
         corpus = corpus.drop_duplicates()
 
@@ -47,10 +61,13 @@ class CompanyCorpus(object):
     def _get_words(phrase):
 
         """
+        Split the descriptions up into individual words
 
-        :param phrase:
-        :return:
+        Parameters:
+
+            phrase - string; description to parse into words
         """
+
         words = [word.lower().translate(str.maketrans(' ', ' ', string.punctuation))
                  for word in re.split('\s|\.|-|,', str(phrase))]
 
@@ -59,12 +76,17 @@ class CompanyCorpus(object):
     def build_idf(self, description_column_name, out_file=None, csv_location=None):
 
         """
+        Build the inverse document frequency vector
 
-        :param description_column_name:
-        :param out_file:
-        :param csv_location:
-        :return:
+        Parameters:
+
+            description_column_name - string; name of the description column in the dataframe
+
+            out_file (optional) - string; filename to save the idf vector
+
+            csv_location (optional) - string; location of csv file containing the pre-built IDF vector to use
         """
+
         idfcalc = tfidf.TfIdf()
 
         for entry in self.corpus.loc[:, description_column_name].values:
@@ -95,11 +117,15 @@ class CompanyCorpus(object):
     def filter_desc_by_idf(self, description_column_name, number_words_to_cut=50):
 
         """
+        Filter each description by removing words that have low IDF values
 
-        :param description_column_name:
-        :param number_words_to_cut:
-        :return:
+        Parameters:
+
+            description_column_name - string; name of the description column in the dataframe
+
+            number_words_to_cut - integer; number of lowest IDF words to remove
         """
+
         if self.idf_vector_created is False:
             raise BrokenPipeError("IDF vector not created. Must create it before running this function.")
 
@@ -109,6 +135,7 @@ class CompanyCorpus(object):
 
         iteration = 1
         temp_col_vec = []
+
         # Loop through each description
         sys.stdout.write("Filtering descriptions by IDF...")
         for desc in self.corpus.loc[:, description_column_name]:
@@ -116,15 +143,15 @@ class CompanyCorpus(object):
 
             # take intersection of the words with the top idf words and add to a list
             final_words = words.intersection(top_words_set)
-
             temp_col_vec.append(final_words)
-
             iteration += 1
 
         sys.stdout.write('\n')
         sys.stdout.write("Done filtering!\n")
+
         # Set the internal tracker to verify we performed the filter
         self.filtered_by_idf = True
+
         # Convert the list to a pandas series for ease of use and addition to the corpus dataframe
         final_rare_words_vector = pd.Series(temp_col_vec)
 
@@ -134,6 +161,14 @@ class CompanyCorpus(object):
 
 
 class CompanyGraph(object):
+
+    """
+    Class representing a company graph
+
+    Parameters:
+
+        company_corpus_instance - CompanyCorpus; a pre-instantiated CompanyCorpus object
+    """
 
     def __init__(self, company_corpus_instance):
 
@@ -148,6 +183,13 @@ class CompanyGraph(object):
 
     def build_lsh_forest(self, company_name_column_name):
 
+        """
+        Build the LSH forest data structure from the sets of parsed description words for each company
+
+        Parameters:
+
+            company_name_column_name - string; name of the company name column in the company corpus dataframe
+        """
         # Note: num_perm is a tuning parameter, but has been abstracted away for simplicity
         #       256 has been found to be a good amount. Increasing it may increase accuracy,
         #       but will decrease speed and increase memory usage. Decreasing will decrease accuracy
@@ -181,7 +223,8 @@ class CompanyGraph(object):
             iteration += 1
         sys.stdout.write('\n')
         sys.stdout.write("Done performing LSH!\n")
-        # Need this line below to be able to query LSH forest!!!! (See datasketch docs on LSH forest for reasoning)
+
+        # Need this line below to be able to query LSH forest! (See datasketch docs on LSH forest for reasoning)
         lsh_forest.index()
         self.lsh_forest = lsh_forest
 
@@ -190,20 +233,30 @@ class CompanyGraph(object):
                                          company_words_list, idf_set, idf_map_dict):
 
         """
+        Calculate the weighted Jaccard similarity
 
-        :param company_index_1:
-        :param company_index_2:
-        :param company_words_list:
-        :param idf_set:
-        :param idf_map_dict:
-        :return:
+        Parameters:
+
+            company_index_1 - integer; index of first company in the pair
+
+            company_index_2 - integer; index of secont company in the pair
+
+            company_words_list - dictionary; table matching company words to the company index
+
+            idf_set - set; a set of the idf words
+
+            idf_map_dict - dictionary; idf value to word look up table
         """
+
         company_1 = company_words_list[company_index_1]
         company_2 = company_words_list[company_index_2]
+
         intersection = company_1 & company_2
         union = company_1 | company_2
+
         if len(union) == 0:
             return 0
+
         intersection_score = 0.0
         union_score = 0.0
         for word in union:
@@ -218,10 +271,14 @@ class CompanyGraph(object):
     def build_graph(self, sensitivity):
 
         """
+        Build the graph adjacency matrix based on the LSH hashed values
 
-        :param sensitivity: the number of similar companies to query for each company from the LSH forest,
+        Parameters:
+
+            sensitivity - integer; the number of similar companies to query for each company from the LSH forest,
                             larger the better (generally), as too small will not have enough sensitivity
         """
+
         if self.lsh_forest is None:
             raise ValueError("LSH forest not yet created. Run build_lsh_forest function first.")
 
@@ -257,6 +314,7 @@ class CompanyGraph(object):
             iteration += 1
         sys.stdout.write('\n')
         print("Done building graph!")
+
         # noinspection PyTypeChecker
         company_sim_adjacency_matrix.setdiag(0)
 
@@ -269,11 +327,15 @@ class CompanyGraph(object):
     def get_dot_product_score(self, company1, company2):
 
         """
+        Calculate the dot product score using the rows of the (symmetric) adjacency matrix
 
-        :param company1:
-        :param company2:
-        :return:
+        Parameters:
+
+            company1 - string; name of the first company
+
+            company2 - string; name of the second company
         """
+
         if self.graph is None:
             raise ValueError("No graph created. Build the graph first.")
 
@@ -292,13 +354,18 @@ class CompanyGraph(object):
     def get_jaccard_similarity(self, company1, company2):
 
         """
+        Calculate the weighted Jaccard similarity
 
-        :param company1:
-        :param company2:
-        :return:
+        Parameters:
+
+            company1 - string; name of the first company
+
+            company2 - string; name of the second company
         """
+
         if self.graph is None:
             raise ValueError("No graph created. Build the graph first.")
+
         # Get the vector of first company
         company1_index = self.name_to_index_map[company1]
 
@@ -318,8 +385,18 @@ class CompanyGraph(object):
 
 
 def save_graph(graph, filename, location=None):
-    # Optional location argument to change where to load from.
-    # Default location is within the library folder
+    """
+    Pickle the adjacency matrix  to a file for reuse
+
+    Parameters:
+
+        graph - Scipy sparse matrix; adjacency matrix
+
+        filename - string;
+
+        location (optional) - string; default location is within the library folder
+    """
+
     if location:
         with open(location + '/' + filename, 'wb') as fout:
             pickle.dump(graph, fout)
@@ -329,8 +406,16 @@ def save_graph(graph, filename, location=None):
 
 
 def load_graph(filename, location=None):
-    # Optional location argument to change where to load from.
-    # Default location is within the library folder
+    """
+    Load the pickled the adjacency matrix
+
+    Parameters:
+
+        filename - string;
+
+        location (optional) - string; default location is within the library folder
+    """
+
     if location:
         with open(location + '/' + filename, 'rb') as fin:
             data = pickle.load(fin)
