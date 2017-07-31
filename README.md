@@ -32,7 +32,9 @@ company_list = pd.DataFrame(company_info)
 
 # Setup the parameters
 DESCRIPTION_COLUMN = 'description'
+NAME_COLUMN = 'company_domain'
 NUMBER_OF_WORDS = 3
+NUMBER_SIMILAR_COMPANIES = 3
 
 cc = cs.CompanyCorpus(company_list)
 cc.build_idf(description_column_name=DESCRIPTION_COLUMN)
