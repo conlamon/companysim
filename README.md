@@ -1,3 +1,5 @@
+Feature engineering for determining text based similarity between pairs of companies using only their publicly available value propositions
+
 ## Synopsis
 
 Companysim is a Python module for generating measures of company similarity based on textual description information. The algorithm was developed for the class CS 341 at Stanford University, in conjunction with the venture capital firm Rocketship.vc
