@@ -1,4 +1,5 @@
-Feature engineering for determining text based similarity between pairs of companies using only their publicly available value propositions
+# CompanySim 
+Measuring text based similarity between pairs of companies using only their publicly available value propositions
 
 ## Synopsis
 
