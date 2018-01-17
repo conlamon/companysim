@@ -26,6 +26,7 @@ We found using a K-nearest neighbor (KNN) binary classification algorithm with e
 ## Code Example
 
 ```python
+import pandas as pd
 import companysim.companysim as cs
 
 company_info = {'company_domain': ['xyz.com', 'abc.com'],
